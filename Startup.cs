@@ -28,10 +28,11 @@ namespace MovieEmailService
         public void ConfigureServices(IServiceCollection services)
         {
             var emailSettings = new EmailSettings();
+            Configuration.Bind(nameof(emailSettings), emailSettings);
             services.AddSingleton(emailSettings);
             services.AddControllers();
 
-
+            
 
             services.AddSwaggerGen(c =>
             {
