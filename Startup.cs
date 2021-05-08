@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MovieEmailService.Settings;
+using NETCore.MailKit.Extensions;
+using NETCore.MailKit.Infrastructure.Internal;
 
 namespace MovieEmailService
 {
@@ -28,10 +30,25 @@ namespace MovieEmailService
         public void ConfigureServices(IServiceCollection services)
         {
             var emailSettings = new EmailSettings();
+            Configuration.Bind(nameof(emailSettings), emailSettings);
             services.AddSingleton(emailSettings);
             services.AddControllers();
 
+            services.AddMailKit(optionBuilder =>
+            {
+                optionBuilder.UseMailKit(new MailKitOptions()
+                {
+                    Server = emailSettings.server,
+                    Port = emailSettings.port,
+                    SenderName = emailSettings.from,
+                    SenderEmail = emailSettings.email,
 
+                    Account = emailSettings.email,
+                    Password = emailSettings.password,
+
+                    Security = true
+                });
+            });
 
             services.AddSwaggerGen(c =>
             {
