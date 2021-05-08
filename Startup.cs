@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MovieEmailService.Settings;
 
 namespace MovieEmailService
 {
@@ -26,8 +27,12 @@ namespace MovieEmailService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            var emailSettings = new EmailSettings();
+            services.AddSingleton(emailSettings);
             services.AddControllers();
+
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieEmailService", Version = "v1" });
