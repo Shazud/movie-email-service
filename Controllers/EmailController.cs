@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MovieEmailService.Models;
 using NETCore.MailKit.Core;
 
 namespace MovieEmailService.Controllers
@@ -32,8 +33,15 @@ namespace MovieEmailService.Controllers
 
 
         [HttpPost]
-        public ActionResult EmailTarget()
+        public ActionResult EmailTarget(Email email)
         {
+            if(email.email == string.Empty) return BadRequest();
+            _emailService.Send(
+                mailTo: email.email,
+                subject: email.subject,
+                message: email.body,
+                isHtml: false
+            );
             return Ok(new { ok = "target" });
         }
     }
