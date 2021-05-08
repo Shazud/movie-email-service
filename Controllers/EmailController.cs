@@ -36,4 +36,5 @@ namespace MovieEmailService.Controllers
         {
             return Ok(new { ok = "target" });
         }
+    }
 }
