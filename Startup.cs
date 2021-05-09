@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MovieEmailService.Services;
 using MovieEmailService.Settings;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
@@ -32,7 +34,24 @@ namespace MovieEmailService
             var emailSettings = new EmailSettings();
             Configuration.Bind(nameof(emailSettings), emailSettings);
             services.AddSingleton(emailSettings);
+
+            var userServiceSettings = new UserServiceSettings();
+            Configuration.Bind(nameof(userServiceSettings), userServiceSettings);
+            services.AddSingleton(userServiceSettings);
+
+            var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => {return true;};
+            var client = new HttpClient(httpClientHandler);
+
+            services.AddSingleton(client);
+
+
+
+            services.AddScoped<IUserService, UserService>();
             services.AddControllers();
+
+
+
 
             services.AddMailKit(optionBuilder =>
             {

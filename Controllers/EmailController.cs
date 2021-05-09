@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MovieEmailService.Models;
+using MovieEmailService.Services;
 using NETCore.MailKit.Core;
 
 namespace MovieEmailService.Controllers
@@ -9,27 +12,58 @@ namespace MovieEmailService.Controllers
     public class EmailController : ControllerBase
     {
         private readonly IEmailService _emailService;
+        private readonly IUserService _usersService;
 
-        public EmailController(IEmailService emailService)
+        public EmailController(IEmailService emailService, IUserService usersService)
         {
             _emailService = emailService;
+            _usersService = usersService;
         }
 
 
         //POST api/mail/username
         [HttpPost("{username}")]
-        public ActionResult EmailUser(string username)
+        public ActionResult EmailUser(string username, Email email)
         {
-            return Ok(new { ok = username} );
+            email.email = _usersService.GetUserByUsername(username).Result.email;
+            if(email.email == null)
+            {
+                return NotFound();
+            }
+            return EmailTarget(email);
         }
 
 
         [HttpPost("newsletter")]
-        public ActionResult EmailNewsletter()
+        public ActionResult EmailNewsletter(Email email)
         {
-            return Ok(new { ok = "newsletter" });
+            var users = _usersService.GetAllUsers().Result.Where(u => u.email != string.Empty);
+            foreach(var user in users){
+                _emailService.Send(
+                    mailTo: user.email,
+                    subject: email.subject,
+                    message: email.body,
+                    isHtml: false
+                );
+            }
+            return Ok();
         }
 
+
+        [HttpPost("broadcast")]
+        public ActionResult EmailBroadcast(Email email)
+        {
+            var users = _usersService.GetAllUsers().Result.Where(u => u.email != string.Empty);
+            foreach(var user in users){
+                _emailService.Send(
+                    mailTo: user.email,
+                    subject: email.subject,
+                    message: email.body,
+                    isHtml: false
+                );
+            }
+            return Ok();
+        }
 
 
         [HttpPost]
