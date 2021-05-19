@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MovieEmailService.Models;
 using MovieEmailService.Services;
 using NETCore.MailKit.Core;
+using System;
 
 namespace MovieEmailService.Controllers
 {
@@ -25,6 +26,7 @@ namespace MovieEmailService.Controllers
         [HttpPost("{username}")]
         public ActionResult EmailUser(string username, Email email)
         {
+            Console.WriteLine(username + " " + email.subject + " " + email.body);
             email.email = _usersService.GetUserByUsername(username).Result.email;
             if(email.email == null)
             {
