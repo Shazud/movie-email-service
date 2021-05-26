@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -78,7 +79,7 @@ namespace MovieEmailService.Controllers
                 message: email.body,
                 isHtml: false
             );
-            return Ok(new { ok = "target" });
+            return Ok();
         }
     }
 }
